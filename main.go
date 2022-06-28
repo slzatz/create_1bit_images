@@ -16,15 +16,17 @@ func main() {
 
 	fname := os.Args[1]
 	name, _, _ := strings.Cut(fname, ".")
-	cmd := exec.Command("convert", fname, "-resize", "296x400^", "-gravity", "North", "-extent", "296x400",
-		"-depth", "1", "-type", "bilevel", "BMP3:"+name+".bmp")
+	cmd := exec.Command(
+		"convert", fname, "-resize", "296x400^", "-gravity", "North",
+		"-ordered-dither", "o8x8", "-extent", "296x400",
+		"-depth", "1", "-type", "bilevel", "BMP3:"+name+"8d.bmp")
 	cmd.Dir = "/home/slzatz/code/images/pictures"
 	err := cmd.Run()
 	if err != nil {
 		log.Fatalf("ImageMagick convert error: %v\n", err)
 	}
 
-	file, _ := os.Open("pictures/" + name + ".bmp")
+	file, _ := os.Open("pictures/" + name + "8d.bmp")
 	defer file.Close()
 
 	img, err := bmp1bit.Decode(file)
@@ -48,5 +50,5 @@ func main() {
 	for _, v := range z.Pix {
 		bv.Append(v)
 	}
-	os.WriteFile("pictures/"+name+".bz", bv.Bytes(), 0644)
+	os.WriteFile("pictures/"+name+".bd", bv.Bytes(), 0644)
 }
